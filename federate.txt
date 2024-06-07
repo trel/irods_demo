@@ -4,3 +4,8 @@ docker exec -it -u irods irods-demo-other-catalog-provider-1 bash migration_setu
 # to trigger a single resource from Django...
 irule -r irods_rule_engine_plugin-irods_rule_language-instance 'migration_sync_single_hydroshare_resource("/tempZone/home/public/555")' null null
 
+# to trigger files in last x seconds
+docker exec -it -u irods irods-demo-irods-catalog-provider-1 irule -r irods_rule_engine_plugin-irods_rule_language-instance "migration_sync_all_files_newer_than_x_seconds(*seconds)" '*seconds=5' null
+
+# to trigger files in last x seconds (with default 86400 = 1 day)
+docker exec -it -u irods irods-demo-irods-catalog-provider-1 irule -r irods_rule_engine_plugin-irods_rule_language-instance "migration_sync_all_files_newer_than_x_seconds()" null null
