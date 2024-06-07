@@ -1,0 +1,6 @@
+docker exec -it -u irods irods-demo-irods-catalog-provider-1 bash migration_setup_tempZone.sh
+docker exec -it -u irods irods-demo-other-catalog-provider-1 bash migration_setup_otherZone.sh
+
+# to trigger a single resource from Django...
+irule -r irods_rule_engine_plugin-irods_rule_language-instance 'migration_sync_single_hydroshare_resource("/tempZone/home/public/555")' null null
+

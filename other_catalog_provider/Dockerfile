@@ -47,7 +47,7 @@ RUN apt-get update && \
 COPY setup-${irods_version}.input /
 RUN mv /setup-${irods_version}.input /irods_setup.input
 
-RUN apt-get update && apt-get install -y nano jq irods-rule-engine-plugin-python=${irods_resource_plugin_version}
+RUN apt-get update && apt-get install -y nano jq
 
 WORKDIR /
 COPY entrypoint.sh .
