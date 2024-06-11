@@ -32,7 +32,7 @@ def migration_sync_all_files_newer_than_x_seconds(rule_args, callback, rei):
     epoch_seconds_for_genquery = '0'+str(int(time.time() - int(seconds_ago)))
     callback.writeLine('serverLog', 'seconds_ago [{0}]'.format(seconds_ago))
     for result in row_iterator("COLL_NAME, DATA_NAME",
-                               "DATA_MODIFY_TIME > '{0}'".format(epoch_seconds_for_genquery),
+                               "DATA_MODIFY_TIME > '{0}' and DATA_NAME NOT LIKE '%.zip'".format(epoch_seconds_for_genquery),
                                AS_LIST,
                                callback):
         path_to_sync = '{0}/{1}'.format(result[0], result[1])
