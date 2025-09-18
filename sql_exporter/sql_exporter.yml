@@ -1,0 +1,23 @@
+target:
+  data_source_name: postgresql://irods:testpassword@irods-catalog:5432/ICAT?sslmode=disable
+  collectors: [custom_metrics]
+
+collectors:
+  - collector_name: custom_metrics
+    metrics:
+      - metric_name: database_connection_count
+        type: gauge
+        help: 'Number of active connections to the database.'
+        values: [active_connections]
+        query_ref: active_connections_query
+      - metric_name: object_total
+        type: gauge
+        help: 'How many objects in the catalog.'
+        values: [object_count]
+        query_ref: object_count_query
+    queries:
+      - query_name: active_connections_query
+        query: |
+          SELECT count(*) AS active_connections FROM pg_stat_activity;
+      - query_name: object_count_query
+        query: "SELECT COUNT(DISTINCT data_id) as object_count FROM r_data_main"
