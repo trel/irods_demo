@@ -47,6 +47,14 @@ add_transfer(*user, *direction, *bytes){
   msiExecCmd("add_transfer.sh", *theargs, "null", "null", "null", *result);
 }
 
+pep_api_data_obj_write_post(*INSTANCE_NAME, *COMM, *DATAOBJWRITEINP, *BUFFER) {
+  add_transfer(*COMM.user_user_name, 'in', *DATAOBJWRITEINP.len);
+}
+
+pep_api_data_obj_read_post(*INSTANCE_NAME, *COMM, *DATAOBJREADINP, *BUFFER) {
+  add_transfer(*COMM.user_user_name, 'out', *DATAOBJREADINP.len);
+}
+
 pep_api_data_obj_put_post(*INSTANCE_NAME, *COMM, *DATAOBJINP, *BUFFER, *PORTAL_OPR_OUT) {
   add_transfer(*COMM.user_user_name, 'in', *DATAOBJINP.data_size);
 }
