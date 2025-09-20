@@ -63,6 +63,28 @@ pep_api_data_obj_get_post(*INSTANCE_NAME, *COMM, *DATAOBJINP, *BUFFER, *PORTAL_O
   add_transfer(*COMM.user_user_name, 'out', *DATAOBJINP.data_size);
 }
 
+pep_api_data_obj_rsync_post(*INSTANCE_NAME, *COMM, *DATAOBJINP, *OUTPARAMARRAY) {
+  # this is not needed since rsync just calls put and get
+#  writeLine('serverLog', *DATAOBJINP);
+}
+
+pep_api_bulk_data_obj_put_post(*INSTANCE_NAME, *COMM, *BULKOPRINP, *BUFFER) {
+  # bulk can hold up to 50 files, with sizes in data_size_0 through data_size_49
+  # walk through and sum the sizes
+#  writeLine('serverLog', *BULKOPRINP);
+
+  *counter = 0;
+  *totalbytes = 0;
+  foreach(*k in *BULKOPRINP) {
+    if (*k like "data_size_*") then {
+      *counter = *counter + 1;
+      *totalbytes = *totalbytes + int(*BULKOPRINP.*k);
+#      writeLine('serverLog', '[' ++ str(*counter) ++ '] adding [' ++ *BULKOPRINP.*k ++ '], new total [' ++ str(*totalbytes) ++ ']')
+    }
+  }
+  add_transfer(*COMM.user_user_name, 'in', *totalbytes);
+}
+
 .
 w
 q
