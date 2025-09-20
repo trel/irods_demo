@@ -122,56 +122,56 @@ collectors:
         values: [total]
         key_labels: [user_name]
         query: |
-          SELECT u.user_name, COUNT(DISTINCT d.data_id) AS total
+          SELECT CONCAT_WS('#', u.user_name, u.zone_name) AS user_name, COUNT(DISTINCT d.data_id) AS total
           FROM r_data_main d, r_objt_access a, r_user_main u
           WHERE
             d.data_id = a.object_id AND
             a.user_id = u.user_id AND
             a.access_type_id = '1200'
           GROUP BY
-            u.user_name
+            u.user_name, u.zone_name
       - metric_name: irods_replicas_per_owner
         type: gauge
         help: 'Total Replicas per Owner'
         values: [total]
         key_labels: [user_name]
         query: |
-          SELECT u.user_name, COUNT(d.data_id) AS total
+          SELECT CONCAT_WS('#', u.user_name, u.zone_name) AS user_name, COUNT(d.data_id) AS total
           FROM r_data_main d, r_objt_access a, r_user_main u
           WHERE
             d.data_id = a.object_id AND
             a.user_id = u.user_id AND
             a.access_type_id = '1200'
           GROUP BY
-            u.user_name
+            u.user_name, u.zone_name
       - metric_name: irods_collections_per_owner
         type: gauge
         help: 'Total Collections per Owner'
         values: [total]
         key_labels: [user_name]
         query: |
-          SELECT u.user_name, COUNT(d.coll_id) AS total
+          SELECT CONCAT_WS('#', u.user_name, u.zone_name) AS user_name, COUNT(d.coll_id) AS total
           FROM r_coll_main d, r_objt_access a, r_user_main u
           WHERE
             d.coll_id = a.object_id AND
             a.user_id = u.user_id AND
             a.access_type_id = '1200'
           GROUP BY
-            u.user_name
+            u.user_name, u.zone_name
       - metric_name: irods_bytes_per_owner
         type: gauge
         help: 'Total Bytes per Owner'
         values: [total]
         key_labels: [user_name]
         query: |
-          SELECT u.user_name, SUM(d.data_size) AS total
+          SELECT CONCAT_WS('#', u.user_name, u.zone_name) AS user_name, SUM(d.data_size) AS total
           FROM r_data_main d, r_objt_access a, r_user_main u
           WHERE
             d.data_id = a.object_id AND
             a.user_id = u.user_id AND
             a.access_type_id = '1200'
           GROUP BY
-            u.user_name
+            u.user_name, u.zone_name
 
       - metric_name: irods_replicas_per_resource
         type: gauge
@@ -262,7 +262,7 @@ collectors:
         values: [total]
         key_labels: [user_name, direction]
         query: |
-          SELECT u.user_name, t.action as direction, t.bytes AS total
+          SELECT CONCAT_WS('#', u.user_name, u.zone_name) AS user_name, t.action AS direction, t.bytes AS total
           FROM r_transfer_totals t, r_user_main u
           WHERE
             t.user_id = u.user_id
