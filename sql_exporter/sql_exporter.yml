@@ -255,3 +255,14 @@ collectors:
           FROM r_data_main d
           WHERE
             d.data_is_dirty >= '2'
+
+      - metric_name: irods_transfers_per_user
+        type: gauge
+        help: 'Transfers per User'
+        values: [total]
+        key_labels: [user_name, direction]
+        query: |
+          SELECT u.user_name, t.action as direction, t.bytes AS total
+          FROM r_transfer_totals t, r_user_main u
+          WHERE
+            t.user_id = u.user_id
