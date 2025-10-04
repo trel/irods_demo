@@ -9,6 +9,7 @@ if [ -e "${unattended_install_file}" ]; then
     rm ${unattended_install_file}
 
     echo "Installing transfer totals POC"
+    apt update && apt install -y postgresql-client
     su - irods -c 'bash /install_transfer_totals.sh'
 fi
 
