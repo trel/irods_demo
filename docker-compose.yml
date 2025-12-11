@@ -50,7 +50,7 @@ services:
             start_period: 20s
             start_interval: 10s
         volumes:
-          - demoResc-data:/shared
+            - demoResc-data:/shared
         restart: always
         depends_on:
             - irods-catalog
@@ -69,7 +69,7 @@ services:
             start_period: 20s
             start_interval: 10s
         volumes:
-          - demoResc-data:/shared
+            - demoResc-data:/shared
         restart: always
         depends_on:
             - irods-catalog
@@ -89,7 +89,7 @@ services:
             - "19000:19000"
             - "19001:19001"
         volumes:
-          - ./minio-data:/data
+            - ./minio-data:/data
         command: minio server /data
         environment: 
           MINIO_ROOT_USER: irods
