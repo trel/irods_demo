@@ -23,14 +23,16 @@ services:
             retries: 3
             start_period: 20s
             start_interval: 10s
+        volumes:
+          - demoResc-data:/shared
         restart: always
         depends_on:
             - irods-catalog
             - minio
 
-    irods-catalog-consumer:
+    irods-catalog-provider2:
         build:
-            context: irods_catalog_consumer
+            context: irods_catalog_provider2
         shm_size: 500mb
         healthcheck:
             test: ["CMD", "su", "-", "irods", "-c", 'echo -e "\x00\x00\x00\x33<MsgHeader_PI><type>HEARTBEAT</type></MsgHeader_PI>" | (exec 3<>/dev/tcp/127.0.0.1/1247; cat >&3; cat <&3; exec 3<&-)']
@@ -39,93 +41,36 @@ services:
             retries: 3
             start_period: 20s
             start_interval: 10s
+        volumes:
+          - demoResc-data:/shared
         restart: always
         depends_on:
-            irods-catalog-provider:
-                condition: service_healthy
+            - irods-catalog
+            - irods-catalog-provider
+            - minio
+
+    irods-catalog-provider3:
+        build:
+            context: irods_catalog_provider3
+        shm_size: 500mb
+        healthcheck:
+            test: ["CMD", "su", "-", "irods", "-c", 'echo -e "\x00\x00\x00\x33<MsgHeader_PI><type>HEARTBEAT</type></MsgHeader_PI>" | (exec 3<>/dev/tcp/127.0.0.1/1247; cat >&3; cat <&3; exec 3<&-)']
+            interval: 10s
+            timeout: 10s
+            retries: 3
+            start_period: 20s
+            start_interval: 10s
+        volumes:
+          - demoResc-data:/shared
+        restart: always
+        depends_on:
+            - irods-catalog
+            - irods-catalog-provider
+            - minio
 
     irods-client-icommands:
         build:
             context: irods_client_icommands
-        depends_on:
-            irods-catalog-provider:
-                condition: service_healthy
-
-    irods-client-s3-api:
-        image: irods/irods_s3_api:0.5.0
-        volumes:
-            - ./irods_client_s3_api/config.json:/config.json:ro
-            - ./irods_client_s3_api/bucket_mappings.json:/bucket_mappings.json:ro
-            - ./irods_client_s3_api/user_mappings.json:/user_mappings.json:ro
-        ports:
-            - "9002:9000"
-        restart: on-failure
-        depends_on:
-            irods-catalog-provider:
-                condition: service_healthy
-
-    irods-client-http-api:
-        image: irods/irods_http_api:0.6.0
-        volumes:
-            - ./irods_client_http_api/config.json:/config.json:ro
-        ports:
-            - "9001:9000"
-        restart: on-failure
-        depends_on:
-            irods-catalog-provider:
-                condition: service_healthy
-
-    nginx-reverse-proxy:
-        build:
-            context: nginx
-        ports:
-            - "80:80"
-        depends_on:
-            irods-catalog-provider:
-                condition: service_healthy
-
-    irods-client-zmt:
-        build:
-            context: irods_client_zone_management_tool
-        environment:
-            - REACT_APP_HTTP_API_URL=http://localhost/irods-http-api/0.6.0
-            - REACT_APP_APPBAR_LOGO=iRODS-logo.jpg
-            - REACT_APP_LOGIN_LOGO=iRODS-logo-1.png
-            - REACT_APP_FOOTER_LOGO=iRODS-logo.png
-            - REACT_APP_BRANDING_NAME=Zone Management Tool
-            - REACT_APP_PRIMARY_COLOR=#04bdaf
-            - REACT_APP_FILTER_TIME_IN_MILLISECONDS=500
-        volumes:
-            - ./irods_client_zone_management_tool:/usr/src/app
-            - /usr/src/app/node_modules
-        ports:
-            - "9000:3000"
-        depends_on:
-            nginx-reverse-proxy:
-                condition: service_started
-            irods-client-http-api:
-                condition: service_started
-
-    metalnx:
-        build:
-            context: metalnx
-        restart: always
-        ports:
-            - "8080:8080"
-        volumes:
-            - "./metalnx/mylocal-irods-ext:/etc/irods-ext"
-        depends_on:
-            irods-catalog-provider:
-                condition: service_healthy
-
-    irods-client-nfsrods:
-        build:
-            context: irods_client_nfsrods
-        ports:
-            - "2050:2049"
-        volumes:
-            - "./irods_client_nfsrods/nfsrods_config:/nfsrods_config:ro"
-            - "/etc/passwd:/etc/passwd:ro"
         depends_on:
             irods-catalog-provider:
                 condition: service_healthy
@@ -144,37 +89,5 @@ services:
           MINIO_ADDRESS: ":19000"
           MINIO_CONSOLE_ADDRESS: ":19001"
 
-    sql-exporter:
-      image: burningalchemist/sql_exporter:latest
-      ports:
-        - "9399:9399"
-      volumes:
-        - ./sql_exporter/sql_exporter.yml:/sql_exporter.yml
-      command:
-        - --config.file=/sql_exporter.yml
-      depends_on:
-        - irods-catalog
-
-    prometheus:
-      image: prom/prometheus:latest
-      ports:
-        - "9090:9090"
-      volumes:
-        - ./prometheus/prometheus.yml:/prometheus.yml
-      command:
-        - --config.file=/prometheus.yml
-      depends_on:
-        - sql-exporter
-
-    grafana:
-      image: grafana/grafana:latest
-      ports:
-        - "3000:3000"
-      volumes:
-#        - grafana_data:/var/lib/grafana
-        - ./grafana/provisioning:/etc/grafana/provisioning
-      environment:
-        - GF_SECURITY_ADMIN_USER=admin
-        - GF_SECURITY_ADMIN_PASSWORD=admin
-      depends_on:
-        - prometheus
+volumes:
+  demoResc-data:
