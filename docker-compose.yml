@@ -12,6 +12,14 @@ services:
             - POSTGRES_PASSWORD=testpassword
         restart: always
 
+    haproxy:
+        image: haproxy:latest
+        ports:
+            - 2247:1247
+        volumes:
+            - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+        restart: always
+
     irods-catalog-provider:
         build:
             context: irods_catalog_provider
